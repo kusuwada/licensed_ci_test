@@ -1,0 +1,7 @@
+Flask
+PyYAML
+boto3
+Flask-Kerberos
+simplejson
+pytz
+pycrypto

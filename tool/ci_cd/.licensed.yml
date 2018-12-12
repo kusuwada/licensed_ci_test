@@ -1,0 +1,48 @@
+name: myapp
+source_path: '__SOURCE_PATH__'
+cache_path: '__CACHE_PATH__'
+
+python:
+  virtual_env_dir: '__VIRTUAL_ENV_DIR__'
+
+# 一部のsourceだけ有効にしたい場合に使用します
+# default(記述なし)では、発見されたすべてのsourceに対してパースします
+sources:
+  rubygem: false
+  pip: true
+
+# 使用を許可するライセンスの一覧
+allowed:
+  - mit
+  - apache-2.0
+  - bsd
+  - isc
+
+# レビュー済みlibraryの記載
+# licensedでは検出ミスもあるため、問題ないと確認できたlibraryはここに記載する
+reviewed:
+  pip:
+    - mysqlclient  # gpl-2.0
+    - Jinja2       # bsd
+    - simplejson   # AFL & mit
+    - MarkupSafe   # bsd
+    - Click        # bsd
+    - urllib3      # mit
+    - itsdangerous # bsd
+    - Werkzeug     # bsd
+    - Flask        # bsd
+
+# 無視リスト
+# licensedがライセンス表記を発見できなかったが、問題がないと確認できたlibrary
+ignored:
+  pip:
+    - Flask-Kerberos  # bsd
+    - boto3           # apache-2.0
+    - kerberos        # apache-2.0
+    - mysql           # gpl
+    - s3transfer      # apache-2.0
+    - docutils        # bsd, gpl, public domain, gpl-3.0
+    - python-dateutil # apache-2.0, bsd
+    - jmespath        # mit
+    - botocore        # apache-2.0
+    - pycrypto        # public domain

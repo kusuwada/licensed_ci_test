@@ -1,0 +1,54 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - export BUILD_HOME_DIR=`pwd`
+      - echo ${BUILD_HOME_DIR}
+      - apt-get update
+      
+      # install ruby with rbenv
+      - apt-get install -y openssl libssl-dev libreadline6 libreadline6-dev
+      - mkdir ~/.rbenv
+      - git clone https://github.com/rbenv/rbenv.git ~/.rbenv
+      - mkdir ~/.rbenv/plugins ~/.rbenv/plugins/ruby-build
+      - git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
+      - cd ~/.rbenv/plugins/ruby-build
+      - ./install.sh
+      - echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bash_profile
+      - echo 'eval "$(rbenv init -)"' >> ~/.bash_profile
+      #- source ~/.bash_profile
+      - . ~/.bash_profile
+      - rbenv install 2.4.0
+      - rbenv rehash
+      - rbenv global 2.4.0
+      - ruby --version
+      - cd ${BUILD_HOME_DIR}
+      # install packages for licensed
+      - apt-get install -y cmake pkg-config
+      - rbenv exec gem install bundler
+      - rbenv rehash
+      
+      # install packages for requirements
+      - apt-get install -y mysql-server
+
+      # install packages for tool
+      - apt-get install -y bc
+
+  pre_build:
+    commands:
+      - cd ${BUILD_HOME_DIR}
+  build:
+    commands:
+      - echo "----- build start ----"
+      - mkdir /tmp/log
+      # exec oss license check
+      - sh ${BUILD_HOME_DIR}/tool/ci_cd/exec_license_check.sh "${BUILD_HOME_DIR}" /tmp/log > /tmp/log/license_check_log.log
+      # check licenses
+      - sh ${BUILD_HOME_DIR}/tool/ci_cd/check_license.sh /tmp/log/licensed_status.log
+      
+  post_build:
+    commands:
+      - cd ${BUILD_HOME_DIR}
+      # upload logs and oss list to s3
+      - aws s3 sync /tmp/log s3://${BUCKET_NAME}/ --exclude "*" --include "*.log" --include "*.csv"
